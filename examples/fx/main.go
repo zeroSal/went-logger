@@ -120,7 +120,6 @@ func check(lc fx.Lifecycle, l *logger.ConsoleLogger) {
 
 			l.Info(fmt.Sprintf("File content length: %d", len(content)))
 
-
 			l.Info("Check function executed successfully - logger is working!")
 			l.Warn("This is a warning from check function")
 			l.Error("This is an error from check function")
