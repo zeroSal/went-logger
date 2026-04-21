@@ -51,7 +51,7 @@ func (l *ConsoleLogger) log(color, prefix, msg string) {
 
 	_, err := fmt.Fprintf(
 		l.out,
-		"%s%s %s%s\n",
+		"%s%s%s%s\n",
 		color,
 		prefix,
 		msg,
@@ -67,28 +67,32 @@ func (l *ConsoleLogger) Debug(msg string) {
 	if !LevelDebug.ShouldLog(l.level) {
 		return
 	}
-	l.log(ansi.White, "[•]", msg)
+	l.log(ansi.White, "[•] ", msg)
 }
 
 func (l *ConsoleLogger) Info(msg string) {
 	if !LevelInfo.ShouldLog(l.level) {
 		return
 	}
-	l.log(ansi.Blue, "[i]", msg)
+	l.log(ansi.Blue, "[i] ", msg)
 }
 
 func (l *ConsoleLogger) Warn(msg string) {
 	if !LevelWarn.ShouldLog(l.level) {
 		return
 	}
-	l.log(ansi.Yellow, "[!]", msg)
+	l.log(ansi.Yellow, "[!] ", msg)
 }
 
 func (l *ConsoleLogger) Error(msg string) {
 	if !LevelError.ShouldLog(l.level) {
 		return
 	}
-	l.log(ansi.Red, "[×]", msg)
+	l.log(ansi.Red, "[×] ", msg)
+}
+
+func (l *ConsoleLogger) Log(msg string) {
+	l.log(ansi.Reset, "", msg)
 }
 
 func (l *ConsoleLogger) List(msgs []string) {
