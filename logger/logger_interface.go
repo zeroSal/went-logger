@@ -10,9 +10,8 @@ type LoggerInterface interface {
 	SetLevel(level Level)
 	GetLevel() Level
 	GetIdentifier() string
-	Debug(msg string)
-	Info(msg string)
-	Warn(msg string)
-	Error(msg string)
-	List([]string)
+	Debug(msg string) error
+	Info(msg string) error
+	Warn(msg string) error
+	Error(msg string) error
 }

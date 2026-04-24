@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 	"sync"
-
-	"github.com/zeroSal/go-semantic-log/ansi"
 )
 
 var _ LoggerInterface = (*FileLogger)(nil)
@@ -66,85 +64,50 @@ func (l *FileLogger) Close() error {
 	return nil
 }
 
-func (l *FileLogger) log(prefix, msg string) {
+func (l *FileLogger) log(prefix, msg string) error {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
 	if l.file == nil {
-		l.logError("Logger "+l.label+" not initialized. Call Init() first.", nil)
-		return
+		return fmt.Errorf("logger %s not initialized. Call Init() first", l.label)
 	}
 
 	_, err := fmt.Fprintf(l.file, "%s %s\n", prefix, msg)
 	if err != nil {
-		l.logError("Write failed", err)
-		fmt.Fprintf(os.Stderr, "[ERROR] write failed: %v\n", err)
+		return fmt.Errorf("logger %s: write failed", l.label)
 	}
+
+	return nil
 }
 
 func (l *FileLogger) GetIdentifier() string {
 	return l.label
 }
 
-func (l *FileLogger) logError(msg string, err error) {
-	errorString := ""
-	if err != nil {
-		errorString = err.Error()
-	}
-
-	_, _ = fmt.Fprintf(
-		os.Stderr,
-		"%s%s %s%s%s\n",
-		ansi.Red,
-		"[ERROR]",
-		msg,
-		errorString,
-		ansi.Reset,
-	)
-}
-
-func (l *FileLogger) Debug(msg string) {
+func (l *FileLogger) Debug(msg string) error {
 	if !LevelDebug.ShouldLog(l.level) {
-		return
+		return nil
 	}
-	l.log("[DEBUG]", msg)
+	return l.log("[DEBUG]", msg)
 }
 
-func (l *FileLogger) Info(msg string) {
+func (l *FileLogger) Info(msg string) error {
 	if !LevelInfo.ShouldLog(l.level) {
-		return
+		return nil
 	}
-	l.log("[INFO]", msg)
+	return l.log("[INFO]", msg)
 }
 
-func (l *FileLogger) Warn(msg string) {
+func (l *FileLogger) Warn(msg string) error {
 	if !LevelWarn.ShouldLog(l.level) {
-		return
+		return nil
 	}
-	l.log("[WARNING]", msg)
+	return l.log("[WARNING]", msg)
 }
 
-func (l *FileLogger) Error(msg string) {
+func (l *FileLogger) Error(msg string) error {
 	if !LevelError.ShouldLog(l.level) {
-		return
+		return nil
 	}
-	l.log("[ERROR]", msg)
-}
-
-func (l *FileLogger) List(msgs []string) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
-
-	if l.file == nil {
-		l.logError("Logger "+l.label+" not initialized. Call Init() first.", nil)
-		return
-	}
-
-	for _, msg := range msgs {
-		_, err := fmt.Fprintf(l.file, " · %s\n", msg)
-		if err != nil {
-			l.logError("Write failed", err)
-			fmt.Fprintf(os.Stderr, "[ERROR] write failed: %v\n", err)
-		}
-	}
+	return l.log("[ERROR]", msg)
 }
